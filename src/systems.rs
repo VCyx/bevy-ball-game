@@ -3,6 +3,8 @@ use bevy::app::AppExit;
 use bevy::input::Input;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use crate::events::GameOver;
+use crate::game::SimulationState;
 
 pub fn spawn_camera(
     mut commands: Commands,
@@ -39,6 +41,7 @@ pub fn transition_to_main_menu_state(
     if keyboard_input.pressed(KeyCode::M) {
         if app_state.0 != AppState::MainMenu {
             commands.insert_resource(NextState(Some(AppState::MainMenu)));
+            commands.insert_resource(NextState(Some(SimulationState::Paused)));
             println!("Entered AppState::MainMenu")
         }
     }
@@ -50,5 +53,15 @@ pub fn exit_game(
 ) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
         app_exit_event_writer.send(AppExit);
+    }
+}
+
+pub fn handle_game_over(
+    mut commands: Commands,
+    mut game_over_event_reader: EventReader<GameOver>,
+) {
+    for event in game_over_event_reader.iter() {
+        println!("Your final score is: {}", event.score);
+        commands.insert_resource(NextState(Some(AppState::GameOver)));
     }
 }

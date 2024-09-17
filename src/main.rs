@@ -24,6 +24,7 @@ fn main() {
         .add_system(exit_game)
         .add_system(transition_to_game_state)
         .add_system(transition_to_main_menu_state)
+        .add_system(handle_game_over)
         .run();
 }
 
