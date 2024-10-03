@@ -20,20 +20,22 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_state::<SimulationState>()
+            .init_state::<SimulationState>()
             // Events
             .add_event::<GameOver>()
             // On Enter Systems
-            .add_system(pause_simulation.in_schedule(OnEnter(AppState::Game)))
+            .add_systems(OnEnter(AppState::Game), resume_simulation)
             // Plugins
-            .add_plugin(EnemyPlugin)
-            .add_plugin(PlayerPlugin)
-            .add_plugin(ScorePlugin)
-            .add_plugin(StarPlugin)
+            .add_plugins((
+                EnemyPlugin,
+                PlayerPlugin,
+                ScorePlugin,
+                StarPlugin
+            ))
             // Systems
-            .add_system(toggle_simulation.run_if(in_state(AppState::Game)))
+            .add_systems(Update, toggle_simulation.run_if(in_state(AppState::Game)))
             // On Exit Systems
-            .add_system(resume_simulation.in_schedule(OnExit(AppState::Game)))
+            .add_systems(OnExit(AppState::Game), pause_simulation)
         ;
     }
 }

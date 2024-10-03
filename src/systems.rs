@@ -1,6 +1,5 @@
 use crate::AppState;
 use bevy::app::AppExit;
-use bevy::input::Input;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use crate::events::GameOver;
@@ -21,48 +20,66 @@ pub fn spawn_camera(
 }
 
 pub fn transition_to_game_state(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     app_state: Res<State<AppState>>,
     mut next_app_state: ResMut<NextState<AppState>>,
+    mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
-    if keyboard_input.pressed(KeyCode::G) {
-        if app_state.0 != AppState::Game {
-            next_app_state.set(AppState::Game);
-            println!("Entered AppState::Game")
+    if keyboard_input.pressed(KeyCode::KeyG) {
+        match app_state.get() {
+            AppState::Game => {}
+            AppState::MainMenu => {
+                next_app_state.set(AppState::Game);
+                println!("Entered AppState::Game")
+            }
+            AppState::GameOver => {
+                next_app_state.set(AppState::MainMenu);
+                next_simulation_state.set(SimulationState::Paused);
+                println!("Entered AppState::MainMenu")
+            }
         }
     }
 }
 
 pub fn transition_to_main_menu_state(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     app_state: Res<State<AppState>>,
     mut next_app_state: ResMut<NextState<AppState>>,
     mut next_simulation_state: ResMut<NextState<SimulationState>>,
 ) {
-    if keyboard_input.pressed(KeyCode::M) {
-        if app_state.0 != AppState::MainMenu {
-            next_app_state.set(AppState::MainMenu);
-            next_simulation_state.set(SimulationState::Paused);
-            println!("Entered AppState::MainMenu")
+    if keyboard_input.pressed(KeyCode::KeyM) {
+        match app_state.get() {
+            AppState::MainMenu => {}
+            AppState::Game => {
+                next_app_state.set(AppState::MainMenu);
+                next_simulation_state.set(SimulationState::Paused);
+                println!("Entered AppState::MainMenu")
+            }
+            AppState::GameOver => {
+                next_app_state.set(AppState::MainMenu);
+                next_simulation_state.set(SimulationState::Paused);
+                println!("Entered AppState::MainMenu")
+            }
         }
     }
 }
 
 pub fn exit_game(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut app_exit_event_writer: EventWriter<AppExit>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Escape) {
-        app_exit_event_writer.send(AppExit);
+        app_exit_event_writer.send(AppExit::Success);
     }
 }
 
 pub fn handle_game_over(
-    mut commands: Commands,
     mut game_over_event_reader: EventReader<GameOver>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
-    for event in game_over_event_reader.iter() {
+    for event in game_over_event_reader.read() {
         println!("Your final score is: {}", event.score);
-        commands.insert_resource(NextState(Some(AppState::GameOver)));
+        next_state.set(AppState::GameOver);
+        next_state.set(AppState::MainMenu);
     }
 }

@@ -4,6 +4,7 @@ use crate::game::SimulationState;
 pub fn pause_simulation(
     mut simulation_state_next_state: ResMut<NextState<SimulationState>>
 ) {
+   println!("Pause");
     simulation_state_next_state.set(SimulationState::Paused)
 }
 
@@ -14,23 +15,14 @@ pub fn resume_simulation(
 }
 
 pub fn toggle_simulation(
-    mut commands: Commands,
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut simulation_next_state: ResMut<NextState<SimulationState>>,
     simulation_state: Res<State<SimulationState>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
-        if simulation_state.0 == SimulationState::Running {
-            commands.insert_resource(
-                NextState(Some(SimulationState::Paused))
-            );
-            println!("Simulation Paused.")
-        }
-
-        if simulation_state.0 == SimulationState::Paused {
-            commands.insert_resource(
-                NextState(Some(SimulationState::Running))
-            );
-            println!("Simulation Running.")
+        match simulation_state.get() {
+            SimulationState::Running => simulation_next_state.set(SimulationState::Paused),
+            SimulationState::Paused => simulation_next_state.set(SimulationState::Running),
         }
     }
 }

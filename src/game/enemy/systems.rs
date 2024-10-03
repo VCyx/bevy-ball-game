@@ -1,5 +1,5 @@
 use bevy::asset::AssetServer;
-use bevy::audio::Audio;
+use bevy::audio::AudioBundle;
 use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{default, Commands, Entity, Query, Res, ResMut, SpriteBundle, Time, Transform, Window, With};
 use bevy::window::PrimaryWindow;
@@ -56,8 +56,8 @@ pub fn enemy_movement(
 pub fn update_enemy_direction(
     mut enemy_query: Query<(&Transform, &mut Enemy)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    audio: Res<Audio>,
     asset_server: Res<AssetServer>,
+    mut commands: Commands
 ) {
     let window = window_query.get_single().unwrap();
 
@@ -82,15 +82,21 @@ pub fn update_enemy_direction(
 
         //     Play SFX
         if direction_changed {
-            let sound_effect_1 = asset_server.load("audio/pluck_001.ogg");
-            let sound_effect_2 = asset_server.load("audio/pluck_002.ogg");
+            let sound_effect_1 = AudioBundle {
+                source: asset_server.load("audio/pluck_001.ogg"),
+                ..default()
+            };
+            let sound_effect_2 = AudioBundle {
+                source: asset_server.load("audio/pluck_002.ogg"),
+                ..default()
+            };
             let sound_effect = if random::<f32>() > 0.5 {
                 sound_effect_1
             } else {
                 sound_effect_2
             };
 
-            audio.play(sound_effect);
+            commands.spawn(sound_effect);
         }
     }
 }

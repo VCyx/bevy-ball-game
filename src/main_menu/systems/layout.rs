@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use bevy::text::BreakLineOn;
 use crate::main_menu::components::{MainMenu, PlayButton, QuitButton};
-use crate::main_menu::styles::{get_button_text_style, get_title_text_style, BUTTON_STYLE, IMAGE_STYLE, MAIN_MENU_STYLE, NORMAL_BUTTON_COLOR, TITLE_STYLE};
+use crate::main_menu::styles::{get_button_text_style, get_title_text_style, get_button_style, get_main_menu_style, NORMAL_BUTTON_COLOR, get_title_style, get_image_style};
 
 pub fn spawn_main_menu(
     mut commands: Commands,
@@ -25,7 +26,7 @@ pub fn build_main_menu(
     let main_menu_entity = commands.spawn(
         (
             NodeBundle {
-                style: MAIN_MENU_STYLE,
+                style: get_main_menu_style(),
                 ..default()
             },
             MainMenu {}
@@ -35,7 +36,7 @@ pub fn build_main_menu(
             //     Title
             parent.spawn(
                 NodeBundle {
-                    style: TITLE_STYLE,
+                    style: get_title_style(),
                     ..default()
                 }
             )
@@ -43,7 +44,7 @@ pub fn build_main_menu(
                     //     Image 1
                     parent.spawn(
                         ImageBundle {
-                            style: IMAGE_STYLE,
+                            style: get_image_style(),
                             image: asset_server.load("sprites/ball_blue_large.png").into(),
                             ..default()
                         }
@@ -58,7 +59,8 @@ pub fn build_main_menu(
                                         get_title_text_style(&asset_server)
                                     )
                                 ],
-                                alignment: TextAlignment::Center,
+                                justify: JustifyText::Center,
+                                linebreak_behavior: BreakLineOn::NoWrap,
                                 ..default()
                             },
                             ..default()
@@ -67,7 +69,7 @@ pub fn build_main_menu(
                     //     Image 2
                     parent.spawn(
                         ImageBundle {
-                            style: IMAGE_STYLE,
+                            style: get_image_style(),
                             image: asset_server.load("sprites/ball_red_large.png").into(),
                             ..default()
                         }
@@ -77,7 +79,7 @@ pub fn build_main_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: BUTTON_STYLE,
+                        style: get_button_style(),
                         background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
@@ -94,7 +96,7 @@ pub fn build_main_menu(
                                         get_button_text_style(&asset_server)
                                     )
                                 ],
-                                alignment: TextAlignment::Center,
+                                justify: JustifyText::Center,
                                 ..default()
                             },
                             ..default()
@@ -106,7 +108,7 @@ pub fn build_main_menu(
             parent.spawn(
                 (
                     ButtonBundle {
-                        style: BUTTON_STYLE,
+                        style: get_button_style(),
                         background_color: NORMAL_BUTTON_COLOR.into(),
                         ..default()
                     },
@@ -123,7 +125,7 @@ pub fn build_main_menu(
                                         get_button_text_style(&asset_server)
                                     )
                                 ],
-                                alignment: TextAlignment::Center,
+                                justify: JustifyText::Center,
                                 ..default()
                             },
                             ..default()
